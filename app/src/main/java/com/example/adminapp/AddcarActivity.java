@@ -10,6 +10,7 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,14 +50,15 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import static com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
 
 public class AddcarActivity extends AppCompatActivity {
-ImageView Carimages;
-private final int GALLERY=1;
-StorageReference mstorage;
-TextView show;
-Button save;
-Firebase firebase;
-EditText edtname,edtcarmodel,edtcapacity,edtrent;
-Toolbar tooladdcar;
+    ImageView Carimages;
+    private final int GALLERY = 1;
+    StorageReference mstorage;
+    TextView show;
+    String ImageUrl;
+    Button save;
+    Firebase firebase;
+    EditText edtname, edtcarmodel, edtcapacity, edtrent;
+    Toolbar tooladdcar;
 
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -82,9 +84,8 @@ Toolbar tooladdcar;
         edtrent = findViewById(R.id.edtrent);
 
 
-
         mProgressBar = findViewById(R.id.progress_bar);
-        FirebaseUser  Id =FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser Id = FirebaseAuth.getInstance().getCurrentUser();
 
         mStorageRef = FirebaseStorage.getInstance().getReference("Admin");
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("Admin");
@@ -103,6 +104,10 @@ Toolbar tooladdcar;
                     Toast.makeText(AddcarActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
                 } else {
                     uploadFile();
+
+                    Intent intent=new Intent(AddcarActivity.this,MainActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -137,20 +142,22 @@ Toolbar tooladdcar;
 
     private void uploadFile() {
 
-        final String  aname=   edtname.getText().toString();
-        final String  amodel=edtcarmodel.getText().toString();
-        final String  acapacity=edtcapacity.getText().toString();
-        final String  aedtrent=edtrent.getText().toString();
+        final String aname = edtname.getText().toString();
+        final String amodel = edtcarmodel.getText().toString();
+        final String acapacity = edtcapacity.getText().toString();
+        final String aedtrent = edtrent.getText().toString();
 
 
         if (mImageUri != null) {
-            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+            final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
 
-            mUploadTask = fileReference.putFile(mImageUri)
+            fileReference.putFile(mImageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -160,10 +167,18 @@ Toolbar tooladdcar;
                             }, 500);
 
                             Toast.makeText(AddcarActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
-                            CarRemove upload = new CarRemove(aname,amodel,aedtrent,
-                                    taskSnapshot.getUploadSessionUri().toString(),acapacity);
-                            String uploadId = mDatabaseRef.push().getKey();
-                            mDatabaseRef.child(uploadId).setValue(upload);
+
+                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String url = uri.toString();
+                                    CarRemove upload = new CarRemove(aname, amodel, aedtrent, url.toString(), acapacity);
+                                    String uploadId = mDatabaseRef.push().getKey();
+                                    mDatabaseRef.child(uploadId).setValue(upload);
+                                }
+                            });
+
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

@@ -8,12 +8,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adminapp.CarRemoveModel.CarRemove;
+import com.example.adminapp.CarRemoveModel.ModelforImage;
 import com.example.adminapp.CarviewModelfirebase.Blog;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -27,14 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewCarActivity extends AppCompatActivity {
-    private Blog carviewModel;
+    private CarRemove display;
     private DatabaseReference databaseReference;
-    FirebaseRecyclerAdapter<Blog, Car_On_Road_Recyclerview_Adapter> firebaseRecyclerAdapter;
-    FirebaseRecyclerOptions<Blog> options;
+    FirebaseRecyclerAdapter<CarRemove, Car_On_Road_Recyclerview_Adapter> firebaseRecyclerAdapter;
+    FirebaseRecyclerOptions<CarRemove> options;
     RecyclerView recyclerView;
     Toolbar toolcarviewpage;
 
-
+ProgressBar progress;
    LinearLayoutManager layoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,7 @@ public class ViewCarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_car);
 
         recyclerView=findViewById(R.id.recyclercarview);
+        progress=findViewById(R.id.progress);
         toolcarviewpage=findViewById(R.id.toolcarviewpage);
         recyclerView.setHasFixedSize(true);
 
@@ -55,39 +60,30 @@ public class ViewCarActivity extends AppCompatActivity {
 
 
         FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        String Id=user.getUid();
+//        String Id=user.getUid();
         databaseReference=FirebaseDatabase.getInstance().getReference().child("Admin");
         databaseReference.keepSynced(true);
 
-       options= new FirebaseRecyclerOptions.Builder<Blog>().setQuery(databaseReference,Blog.class).build();
+       options= new FirebaseRecyclerOptions.Builder<CarRemove>().setQuery(databaseReference,CarRemove.class).build();
 
 
-       firebaseRecyclerAdapter =new FirebaseRecyclerAdapter<Blog, Car_On_Road_Recyclerview_Adapter>(options) {
+       firebaseRecyclerAdapter =new FirebaseRecyclerAdapter<CarRemove, Car_On_Road_Recyclerview_Adapter>(options) {
 
            @Override
-           protected void onBindViewHolder(@NonNull Car_On_Road_Recyclerview_Adapter car_on_road_recyclerview_adapter, int i, @NonNull Blog blog) {
-
+           protected void onBindViewHolder(@NonNull Car_On_Road_Recyclerview_Adapter car_on_road_recyclerview_adapter, int i, @NonNull CarRemove carRemove) {
                String getkey=getRef(i).getKey();
-               car_on_road_recyclerview_adapter.txtviewcarname.setText(String.valueOf(blog.getName()));
-               car_on_road_recyclerview_adapter.txtviewcarmodel.setText(String.valueOf(blog.getAge()));
+               car_on_road_recyclerview_adapter.txtviewcarname.setText(String.valueOf(carRemove.getName()));
+//               car_on_road_recyclerview_adapter.txtviewcarmodel.setText(String.valueOf(display.getModel()));
 
-               Picasso.with(car_on_road_recyclerview_adapter.Carviewimages.getContext()).load(blog.getImage())
+               Picasso.with(car_on_road_recyclerview_adapter.Carviewimages.getContext()).load(carRemove.getImage())
                        .into(car_on_road_recyclerview_adapter.Carviewimages);
 
+
+               progress.setVisibility(View.INVISIBLE);
                Toast.makeText(ViewCarActivity.this, getkey, Toast.LENGTH_SHORT).show();
-
-
-//               car_on_road_recyclerview_adapter.itemView.setOnClickListener(new View.OnClickListener() {
-//                   @Override
-//                   public void onClick(View view) {
-//
-//                       Intent intent=new Intent(ViewCarActivity.this,AddcarActivity.class);
-//                       startActivity(intent);
-//                   }
-//               });
-
-
            }
+
+
 
 
 

@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
  Toolbar toolmainpage;
  TextView txtadminname;
 
+ Button logout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +32,19 @@ public class MainActivity extends AppCompatActivity {
       toolmainpage=findViewById(R.id.toolmainpage);
 
         txtadminname=findViewById(R.id.txtadminname);
+        logout=findViewById(R.id.logout);
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+
+                Intent intent =new Intent(MainActivity.this,FirstPageActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
+        });
 
         setSupportActionBar(toolmainpage);
 
@@ -41,8 +57,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(MainActivity.this,AddcarActivity.class);
                 startActivity(intent);
+
+
             }
         });
+
+
         linearremovecar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,4 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
         txtadminname.setText(admin);
     }
+
+
 }

@@ -36,10 +36,19 @@
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
     <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/recyclercarview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
 </androidx.recyclerview.widget.RecyclerView>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        />
 </LinearLayout>
